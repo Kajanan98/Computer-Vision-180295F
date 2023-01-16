@@ -419,27 +419,6 @@ y_pred = full_pipeline.predict_proba(X_eval)
 
 print(amex_metric(y_pred, y_eval))
 
-"""# Output"""
-full_pipeline.fit(Features,target)
-
-joblib.dump(full_pipeline, 'pipes.joblib')
-
-test_probas = full_pipeline.predict_proba(test)
-
-test = pd.read_parquet("/kaggle/input/amex-data-integer-dtypes-parquet-format/test.parquet")
-
-tests = test.groupby('customer_ID').tail(1)
-
-print(tests.shape)
-
-tests['prediction']=test_probas[:,1]
-print(tests['prediction'])
-
-sub = tests[['customer_ID','prediction']]
-
-sub.to_csv("my_submission.csv", index=False)
-
-
 """# Light BGM"""
 from lightgbm import LGBMClassifier
 
@@ -466,3 +445,25 @@ full_pipeline.fit(X_train, y_train)
 y_pred = full_pipeline.predict_proba(X_eval)
 
 print(amex_metric(y_pred, y_eval))
+
+"""# Output"""
+full_pipeline.fit(Features,target)
+
+joblib.dump(full_pipeline, 'pipes.joblib')
+
+test_probas = full_pipeline.predict_proba(test)
+
+test = pd.read_parquet("/kaggle/input/amex-data-integer-dtypes-parquet-format/test.parquet")
+
+tests = test.groupby('customer_ID').tail(1)
+
+print(tests.shape)
+
+tests['prediction']=test_probas[:,1]
+print(tests['prediction'])
+
+sub = tests[['customer_ID','prediction']]
+
+sub.to_csv("my_submission.csv", index=False)
+
+
