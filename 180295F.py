@@ -438,3 +438,31 @@ print(tests['prediction'])
 sub = tests[['customer_ID','prediction']]
 
 sub.to_csv("my_submission.csv", index=False)
+
+
+"""# Light BGM"""
+from lightgbm import LGBMClassifier
+
+lgbm = LGBMClassifier(
+    n_estimators= 3000, 
+    num_leaves= 100,
+    learning_rate= 0.01,
+    colsample_bytree= 0.6,
+    objective = 'binary',
+    max_depth= 8,
+    min_data_in_leaf = 27,
+    bagging_freq = 7,
+    bagging_fraction= 0.8,
+    feature_fraction = 0.4,
+)
+
+full_pipeline = Pipeline([
+    ("preprocessor", preprocessor),
+    ("estimators", lgbm),
+])
+
+full_pipeline.fit(X_train, y_train)
+
+y_pred = full_pipeline.predict_proba(X_eval)
+
+print(amex_metric(y_pred, y_eval))
