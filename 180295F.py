@@ -44,7 +44,6 @@ train_labels = pd.read_csv("../input/amex-default-prediction/train_labels.csv")
 
 """# Describe"""
 
-train.shape, test.shape, train_labels.shape
 
 train.duplicated().sum()
 
@@ -69,7 +68,7 @@ for i in numeric_cols:
 """# Preprocessing"""
 
 import matplotlib.style as style
-import seaborn as sns
+
 style.use('seaborn-poster')
 sns.set_style('ticks')
 plt.subplots(figsize = (270,200))
@@ -80,14 +79,13 @@ mask = np.zeros_like(train.corr(), dtype=np.bool)
 mask[np.triu_indices_from(mask)] = True
 
 
-sns.heatmap(train.corr(), cmap=plt.get_cmap('Blues'), annot=True, mask=mask, center = 0, square=True, 
-             );
+sns.heatmap(train.corr(), cmap=plt.get_cmap('Blues'), annot=True, mask=mask, center = 0, square=True,);
 ## Give title. 
 plt.title("Heatmap of all the Features", fontsize = 25);
 
 """# Preprocessing Train"""
 
-train.shape
+
 
 train['Date'] =  pd.to_datetime(train['S_2'], format="%Y/%m/%d")
 train['weekday'] = train['Date'].dt.weekday
@@ -99,7 +97,7 @@ train['S_2'] = pd.to_numeric(train['S_2'].str.replace('-',''))
 train['S_2']
 
 train.drop(['Date'], axis=1, inplace=True)
-train.shape
+
 
 cat_features = ["B_30","B_38","D_114","D_116","D_117","D_120","D_126","D_63","D_64","D_66","D_68",'customer_ID']
 
@@ -117,7 +115,7 @@ for i in train.columns:
     if train[i].dtype == 'float64':
         train.astype('float16')
 
-train.shape
+
 
 drop_features = ["B_30","B_38","D_114","D_116","D_117","D_120","D_126","D_63","D_64","D_66","D_68"]
 
@@ -125,7 +123,7 @@ train.drop(drop_features, axis=1, inplace=True)
 
 train = train.groupby('customer_ID',as_index=False).agg(['mean', 'std','sum','last'])
 
-train.shape
+
 
 import gc
 gc.collect()
@@ -133,7 +131,7 @@ gc.collect()
 train.columns.values
 
 train = train.merge(train_cat, how='inner', on="customer_ID")
-train.shape
+
 
 del train_cat
 
@@ -146,7 +144,7 @@ train.columns = join_col
 train.reset_index()
 
 train = train.merge(train_labels, how='inner', on="customer_ID")
-train.shape
+
 
 del train_labels
 
@@ -160,16 +158,16 @@ to_drop = [column for column in upper.columns if any(upper[column] >= 0.98)]
 
 # Drop features 
 
-to_drop
+print(to_drop)
 
-train.shape
+
 
 train.drop(to_drop, axis=1, inplace=True)
-train.shape
+
 
 """# Preprocessing Test"""
 
-test.shape
+
 
 test['Date'] =  pd.to_datetime(test['S_2'], format="%Y/%m/%d")
 test['weekday'] = test['Date'].dt.weekday
@@ -181,7 +179,7 @@ test['S_2'] = pd.to_numeric(test['S_2'].str.replace('-',''))
 test['S_2']
 
 test.drop(['Date'], axis=1, inplace=True)
-test.shape
+
 
 cat_features = ["B_30","B_38","D_114","D_116","D_117","D_120","D_126","D_63","D_64","D_66","D_68",'customer_ID']
 
@@ -189,7 +187,7 @@ for i in test.columns.values:
     if test[i].dtype == 'int64' and i == 'customer_ID':
         test.astype('int16')
 
-test.shape
+
 
 test_copy = test[cat_features].groupby('customer_ID',as_index=False).agg(['count', 'last', 'nunique'])
 
@@ -207,9 +205,9 @@ gc.collect()
 test.head()
 
 test = test.groupby('customer_ID',as_index=False).agg(['mean', 'std','sum',  'last'])
-test.shape
 
-test.shape
+
+
 
 test = test.merge(test_copy, how='inner', on="customer_ID")
 
@@ -223,7 +221,7 @@ test.columns = join_col
 test.reset_index()
 
 test.drop(to_drop, axis=1, inplace=True)
-test.shape
+
 
 del test_copy
 
@@ -232,14 +230,13 @@ gc.collect()
 """# Training"""
 
 target = train['target']
-Features = train.drop('target', axis=1, inplace=False)
-train.shape, Features.shape
+Features = train.drop('target', axis=1, inplace=False), 
 
 numeric_cols = Features.columns[Features.dtypes != "object"].values
 non_numeric_cols = Features.columns[Features.dtypes == 'object'].values
 
 #test_1 = test.loc[:, Features.columns]
-Features.shape, test.shape
+
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
